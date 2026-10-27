@@ -1,6 +1,7 @@
 
-import pytest
 import time
+import pytest
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -12,7 +13,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 def setup_teardown():
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service)
+
     yield driver
+
     driver.quit()
 
 
@@ -33,6 +36,7 @@ def test_empty_username(setup_teardown):
 
     time.sleep(1)
     alert_text = get_alert_text(driver)
+
     assert alert_text == "Username cannot be empty."
 
 
@@ -46,6 +50,7 @@ def test_empty_password(setup_teardown):
 
     time.sleep(1)
     alert_text = get_alert_text(driver)
+
     assert alert_text == "Password cannot be empty."
 
 
@@ -59,6 +64,7 @@ def test_short_password(setup_teardown):
 
     time.sleep(1)
     alert_text = get_alert_text(driver)
+
     assert alert_text == "Password must be at least 6 characters long."
 
 

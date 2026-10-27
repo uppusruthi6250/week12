@@ -5,11 +5,9 @@
     <title>Registration Form</title>
 </head>
 <body>
-    <h1>Registration Form</h1>
+    <h2>Registration Form</h2>
 
-    <form action="/submit" method="POST"
-          onsubmit="return validateForm()">
-
+    <form action="/submit" method="POST" id="registrationForm">
         <label>Username:</label>
         <input type="text" name="username" id="username">
         <br><br>
@@ -18,33 +16,26 @@
         <input type="password" name="pwd" id="pwd">
         <br><br>
 
-        <button type="submit" name="sb">Register</button>
+        <button type="submit" name="sb">Submit</button>
     </form>
 
     <script>
-        function validateForm() {
-            const username =
-                document.getElementById("username").value.trim();
-            const password =
-                document.getElementById("pwd").value;
+        document.getElementById("registrationForm")
+            .addEventListener("submit", function(event) {
+                const username = document.getElementById("username").value.trim();
+                const password = document.getElementById("pwd").value;
 
-            if (username === "") {
-                alert("Username cannot be empty.");
-                return false;
-            }
-
-            if (password === "") {
-                alert("Password cannot be empty.");
-                return false;
-            }
-
-            if (password.length < 6) {
-                alert("Password must be at least 6 characters long.");
-                return false;
-            }
-
-            return true;
-        }
+                if (username === "") {
+                    event.preventDefault();
+                    alert("Username cannot be empty.");
+                } else if (password.trim() === "") {
+                    event.preventDefault();
+                    alert("Password cannot be empty.");
+                } else if (password.length < 6) {
+                    event.preventDefault();
+                    alert("Password must be at least 6 characters long.");
+                }
+            });
     </script>
 </body>
 </html>
