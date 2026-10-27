@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -28,7 +29,7 @@ pipeline {
                         passwordVariable: 'DOCKERHUB_TOKEN'
                     )
                 ]) {
-                    bat 'echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USER% -password-stdin'
+                    bat 'docker login -u %DOCKERHUB_USER% --password-stdin < nul'
                 }
             }
         }
