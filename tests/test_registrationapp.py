@@ -1,3 +1,4 @@
+
 import pytest
 import time
 from selenium import webdriver
@@ -77,6 +78,6 @@ def test_valid_input(setup_teardown):
     )
 
     body_text = driver.find_element(By.TAG_NAME, "body").text
-    assert "Hello, Alice! Welcome to the website" in body_text, (
+    assert "Welcome, Alice!" in body_text, (
         f"Greeting not found or incorrect: {body_text}"
     )
