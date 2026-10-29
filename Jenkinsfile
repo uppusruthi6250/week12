@@ -3,24 +3,31 @@ pipeline {
     agent any
 
     stages {
-        stage('Run Selenium Tests with pytest') {
+        stage('Checkout') {
             steps {
-                echo "Running Selenium Tests using pytest"
-                bat 'pip install -r requirements.txt'
-                bat 'start /B python app.py'
-                bat 'ping 127.0.0.1 -n 5 > nul'
-                bat 'pytest -v'
+                checkout scm
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                bat 'python -m pip install -r requirements.txt'
+            }
+        }
+
+        stage('Run Selenium Tests') {
+            steps {
+                bat 'python -m pytest -v tests/test_registrationapp.py'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo "Build Docker Image"
                 bat 'docker build -t seleniumdemapp:v1 .'
             }
         }
 
-        stage('Docker Login') {
+        stage('Docker Login and Push') {
             steps {
                 withCredentials([
                     usernamePassword(
@@ -29,33 +36,28 @@ pipeline {
                         passwordVariable: 'DOCKERHUB_TOKEN'
                     )
                 ]) {
-                    bat 'docker login -u %DOCKERHUB_USER% --password-stdin < nul'
+                    bat 'echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USER% --password-stdin'
+                    bat 'docker tag seleniumdemapp:v1 uppusruthi6250/sample:seleniumtestimage'
+                    bat 'docker push uppusruthi6250/sample:seleniumtestimage'
                 }
             }
         }
 
-        stage('Push Docker Image to Docker Hub') {
+        stage('Deploy Week 12 to Kubernetes') {
             steps {
-                echo "Push Docker Image to Docker Hub"
-                bat 'docker tag seleniumdemapp:v1 uppusruthi6250/sample:seleniumtestimage'
-                bat 'docker push uppusruthi6250/sample:seleniumtestimage'
-            }
-        }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                bat 'kubectl apply -f deployment.yaml --validate=false'
-                bat 'kubectl apply -f service.yaml'
+                bat 'kubectl apply -f week12-deployment.yaml'
+                bat 'kubectl apply -f week12-service.yaml'
+                bat 'kubectl rollout status deployment/week12-registration-deployment --timeout=120s'
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Week-12 CI/CD pipeline completed successfully!'
         }
         failure {
-            echo 'Pipeline failed. Please check the logs.'
+            echo 'Pipeline failed. Check the Jenkins console output.'
         }
     }
 }
